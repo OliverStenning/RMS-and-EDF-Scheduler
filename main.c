@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <math.h>
 
 const int MAX_CHAR = 1000;
 
@@ -63,11 +64,55 @@ void printTasks() {
     }
 }
 
+// Calculates the minimum total period of tasks
+int getTotalPeriod() {
+
+}
+
+// Checks to see if possible to allocate tasks with RMS without missing deadlines
+int schedulabilityCheckRMS() {
+    float sum = 0;
+    for (int i = 0; i < numTasks; ++i) {
+        sum += ((float) tasks[i].executionTime / (float) tasks[i].period);
+    }
+    printf("Sum: %f\n", sum);
+
+    float max = numTasks * (exp(log(2)/numTasks) - 1);
+    printf("Max: %f\n", max);
+
+    if (sum <= max) {
+        printf("Can be scheduled with RMS!\n");
+        return 1;
+    } else {
+        printf("Cannot be scheduled with RMS!\n");
+        return 0;
+    }
+
+}
+
+// Check to see if possible to allocate tasks with EDF without missing deadlines
+int schedulabilityCheckEDF() {
+    float sum = 0;
+    for (int i = 0; i < numTasks; ++i) {
+        sum += ((float) tasks[i].executionTime / (float) tasks[i].period);
+    }
+
+    if (sum <= 1) {
+        printf("Can be scheduled with EDF!\n");
+        return 1;
+    } else {
+        printf("Cannot be scheduled with EDF!\n");
+        return 0;
+    };
+
+}
+
 int main() {
 
-    readFile("C:\\Users\\Oliver\\Programming\\CLion\\Scheduler\\testcases\\testcase4.txt");
+    readFile("C:\\Users\\Oliver\\Programming\\CLion\\Scheduler\\testcases\\testcase1.txt");
     printTasks();
-
+    schedulabilityCheckRMS();
+    schedulabilityCheckEDF();
     return 0;
 }
 
