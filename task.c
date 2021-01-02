@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "util.h"
 
-void printTasks(struct Task* tasks, int n) {
+void printTasks(struct Task *tasks, int n) {
 
     printf("\nTASKS\n");
 
@@ -12,7 +12,7 @@ void printTasks(struct Task* tasks, int n) {
     }
 }
 
-int superPeriod(struct Task* tasks, int n) {
+int superPeriod(struct Task *tasks, int n) {
     int periods[n];
 
     for (int i = 0; i < n; ++i) {

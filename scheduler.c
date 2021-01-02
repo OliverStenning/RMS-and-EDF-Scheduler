@@ -2,14 +2,14 @@
 #include <stdio.h>
 #include <math.h>
 
-void printSchedule(struct ScheduleEvent* schedule, int n) {
+void printSchedule(struct ScheduleEvent *schedule, int n) {
 
     printf("\nSCHEDULE\n");
 
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n - 1; ++i) {
 
         // Start line with time
-        printf("Time: %2d | ", i);
+        printf("Time: %2d | ", schedule[i].time);
 
         // Finish line if idle
         if (schedule[i].type == 3) {
@@ -38,7 +38,7 @@ void printSchedule(struct ScheduleEvent* schedule, int n) {
     }
 }
 
-int schedulabilityCheck(struct Task* tasks, int n) {
+int schedulabilityCheck(struct Task *tasks, int n) {
 
     // Sum of all (duration / period)
     float sum = 0;
@@ -62,7 +62,7 @@ int schedulabilityCheck(struct Task* tasks, int n) {
 
 }
 
-void prioritiseRMS(struct Task* tasks, int n) {
+void prioritiseRMS(struct Task *tasks, int n) {
 
     // Longest possible period of a given task is the super period
     int maxPeriod = superPeriod(tasks, n);
@@ -86,12 +86,22 @@ void prioritiseRMS(struct Task* tasks, int n) {
 
 }
 
-struct ScheduleEvent* scheduleRMS(struct Task* tasks, int n, int superPeriod) {
+struct ScheduleEvent* scheduleRMS(int *numEvents, struct Task *tasks, int n) {
+
+    // Calculate number of events without misses
+    int sPeriod = superPeriod(tasks, n);
+    *numEvents = sPeriod;
+    for (int i = 0; i < n; ++i) {
+        // Add number of complete periods in super period per task as maximum completions
+        *numEvents += sPeriod / tasks[i].period;
+    }
 
     // Allocate minimum amount of memory used
-    struct ScheduleEvent* schedule = malloc(sizeof(struct ScheduleEvent) * superPeriod);
+    struct ScheduleEvent *schedule = malloc(sizeof(struct ScheduleEvent) * (*numEvents));
 
-    for (int i = 0; i < superPeriod; ++i) {
+    int eventPos = 0;
+
+    for (int i = 0; i < sPeriod; ++i) {
 
         // Reset task progress when period is reached
         for (int j = 0; j < n; ++j) {
@@ -113,9 +123,10 @@ struct ScheduleEvent* scheduleRMS(struct Task* tasks, int n, int superPeriod) {
 
         // If no uncompleted tasks are found then idle at this time
         if (nextTask == -1) {
-            schedule[i].name = 0; // Default value
-            schedule[i].type = 3; // Idle type
-            schedule[i].time = i; // Default value
+            schedule[eventPos].name = 0; // Default value
+            schedule[eventPos].type = 3; // Idle type
+            schedule[eventPos].time = i; // Default value
+            eventPos++;
 
             // End this iteration of time loop early
             continue;
@@ -129,14 +140,22 @@ struct ScheduleEvent* scheduleRMS(struct Task* tasks, int n, int superPeriod) {
         }
 
         // Add new execution event to schedule
-        schedule[i].time = i;
-        schedule[i].name = tasks[nextTask].name;
-        schedule[i].type = 0; // Executes type
+        schedule[eventPos].time = i;
+        schedule[eventPos].name = tasks[nextTask].name;
+        schedule[eventPos].type = 0; // Executes type
+        eventPos++;
 
         // Increment the progress of the task
-        tasks[nextTask].progress += 1;
+        tasks[nextTask].progress++;
+
+        // Add event if task completes
+        if (tasks[nextTask].progress == tasks[nextTask].duration) {
+            schedule[eventPos].time = i;
+            schedule[eventPos].name = tasks[nextTask].name;
+            schedule[eventPos].type = 1; // Completes type
+            eventPos++;
+        }
 
     }
-
     return schedule;
 }

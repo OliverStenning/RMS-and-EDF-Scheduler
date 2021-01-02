@@ -11,9 +11,9 @@ struct Task {
 };
 
 /* Prints value of all tasks to console */
-void printTasks(struct Task* tasks, int n);
+void printTasks(struct Task *tasks, int n);
 
 /* Calculates the super period of current tasks */
-int superPeriod(struct Task* tasks, int n);
+int superPeriod(struct Task *tasks, int n);
 
 #endif //SCHEDULER_TASK_H

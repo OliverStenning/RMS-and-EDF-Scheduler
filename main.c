@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "util.h"
 #include "task.h"
 #include "scheduler.h"
 
@@ -14,11 +13,11 @@ int numTasks = 0;
 struct Task *tasks;
 
 // Variables for storing schedule
-int numScheduleEvents = 0;
-struct ScheduleEvents *schedule;
+int numEvents = 0;
+struct ScheduleEvent *schedule;
 
 // Reads data from input file and stores them in tasks array
-int readFile(char* filename) {
+int readFile(char *filename) {
     FILE *fp;
     char str[MAX_CHAR];
 
@@ -94,16 +93,14 @@ int main() {
         default:
             printf("Cannot be scheduled\n");
             break;
-    };
-
-    numScheduleEvents = superPeriod(tasks, numTasks);
+    }
 
     prioritiseRMS(tasks, numTasks);
 
     printTasks(tasks, numTasks);
 
-    schedule = scheduleRMS(tasks, numTasks, numScheduleEvents);
-    printSchedule(schedule, numScheduleEvents);
+    schedule = scheduleRMS(&numEvents, tasks, numTasks);
+    printSchedule(schedule, numEvents);
 
 
     return 0;
