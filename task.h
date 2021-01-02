@@ -8,6 +8,7 @@ struct Task {
     int period;
     int priority;
     int progress;
+    int completions;
 };
 
 /* Prints value of all tasks to console */

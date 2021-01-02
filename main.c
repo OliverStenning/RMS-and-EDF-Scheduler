@@ -60,6 +60,7 @@ int readFile(char *filename) {
             // Give a placeholder priority and progress
             tasks[index].priority = - 1;
             tasks[index].progress = 0;
+            tasks[index].completions = 0;
 
         }
         index++;
@@ -102,6 +103,7 @@ int main() {
     schedule = scheduleRMS(&numEvents, tasks, numTasks);
     printSchedule(schedule, numEvents);
 
+    printf("Super Period: %d\n", superPeriod(tasks, numTasks));
 
     return 0;
 }

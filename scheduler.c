@@ -8,31 +8,34 @@ void printSchedule(struct ScheduleEvent *schedule, int n) {
 
     for (int i = 0; i < n - 1; ++i) {
 
-        // Start line with time
-        printf("Time: %2d | ", schedule[i].time);
+        // Only print if the schedules
+        if (schedule[i].type != 0) {
+            // Start line with time
+            printf("%d ", schedule[i].time);
 
-        // Finish line if idle
-        if (schedule[i].type == 3) {
-            printf("Idle\n");
-        } else {
+            // Finish line if idle
+            if (schedule[i].type == 4) {
+                printf("Idle\n");
+            } else {
 
-            // If not idle add task name
-            printf("Task %d ", schedule[i].name);
+                // If not idle add task name
+                printf("Task %d ", schedule[i].name);
 
-            // Add operation and finish line
-            switch (schedule[i].type) {
-                case 0:
-                    printf("Executes\n");
-                    break;
-                case 1:
-                    printf("Completes\n");
-                    break;
-                case 2:
-                    printf("Misses\n");
-                    break;
-                default:
-                    printf("\nError\n");
-                    break;
+                // Add operation and finish line
+                switch (schedule[i].type) {
+                    case 1:
+                        printf("Executes\n");
+                        break;
+                    case 2:
+                        printf("Completes\n");
+                        break;
+                    case 3:
+                        printf("Misses\n");
+                        break;
+                    default:
+                        printf("\nError\n");
+                        break;
+                }
             }
         }
     }
@@ -101,11 +104,11 @@ struct ScheduleEvent* scheduleRMS(int *numEvents, struct Task *tasks, int n) {
 
     int eventPos = 0;
 
-    for (int i = 0; i < sPeriod; ++i) {
+    for (int time = 0; time < sPeriod; ++time) {
 
-        // Reset task progress when period is reached
+        // Reset task progress when period is reached and task is completed
         for (int j = 0; j < n; ++j) {
-            if (i % tasks[j].period == 0 && i != 0) {
+            if (time % tasks[j].period == 0 && time != 0 && tasks[j].progress == tasks[j].duration) {
                 tasks[j].progress = 0;
             }
         }
@@ -124,12 +127,26 @@ struct ScheduleEvent* scheduleRMS(int *numEvents, struct Task *tasks, int n) {
         // If no uncompleted tasks are found then idle at this time
         if (nextTask == -1) {
             schedule[eventPos].name = 0; // Default value
-            schedule[eventPos].type = 3; // Idle type
-            schedule[eventPos].time = i; // Default value
+            schedule[eventPos].type = 4; // Idle type
+            schedule[eventPos].time = time; // Default value
+            schedule[eventPos].completions = 0; // Default value
             eventPos++;
 
             // End this iteration of time loop early
             continue;
+        }
+
+        // Check to see if any tasks have missed their deadlines
+        for (int j = 0; j < n; ++j) {
+            if (tasks[j].completions < floor(((double) time) / ((double) tasks[j].period))) {
+                (*numEvents)++;
+                schedule = realloc(schedule, sizeof(struct ScheduleEvent) * (*numEvents));
+                schedule[eventPos].time = time;
+                schedule[eventPos].name = tasks[j].name;
+                schedule[eventPos].type = 3; // Misses type
+                schedule[eventPos].completions = tasks[j].completions;
+                eventPos++;
+            }
         }
 
         // Set next task to highest priority uncompleted task
@@ -140,19 +157,29 @@ struct ScheduleEvent* scheduleRMS(int *numEvents, struct Task *tasks, int n) {
         }
 
         // Add new execution event to schedule
-        schedule[eventPos].time = i;
+        schedule[eventPos].time = time;
         schedule[eventPos].name = tasks[nextTask].name;
-        schedule[eventPos].type = 0; // Executes type
+        schedule[eventPos].type = 1; // Executes type
+        schedule[eventPos].completions = tasks[nextTask].completions;
         eventPos++;
 
         // Increment the progress of the task
         tasks[nextTask].progress++;
 
         // Add event if task completes
-        if (tasks[nextTask].progress == tasks[nextTask].duration) {
-            schedule[eventPos].time = i;
+        if (tasks[nextTask].progress >= tasks[nextTask].duration) {
+
+            // Check to see if task was behind schedule
+            if (tasks[nextTask].completions < floor(((double) time) / ((double) tasks[nextTask].period))) {
+                tasks[nextTask].progress = 0;
+            }
+
+            tasks[nextTask].completions++;
+
+            schedule[eventPos].time = time;
             schedule[eventPos].name = tasks[nextTask].name;
-            schedule[eventPos].type = 1; // Completes type
+            schedule[eventPos].type = 2; // Completes type
+            schedule[eventPos].completions = tasks[nextTask].completions;
             eventPos++;
         }
 

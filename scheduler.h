@@ -9,7 +9,8 @@
 struct ScheduleEvent {
     int time;
     int name;
-    int type; // 0 = Executes | 1 = Completes | 2 = Misses | 3 = Idle
+    int type; // 0 = Undefined | 1 = Executes | 2 = Completes | 3 = Misses | 4 = Idle
+    int completions;
 };
 
 
