@@ -37,4 +37,12 @@ void prioritiseRMS(struct Task *tasks, int n);
 /* Generates a schedule using RMS */
 struct ScheduleEvent* scheduleRMS(int *numEvents, struct Task *tasks, int n);
 
+
+/* Prioritises all tasks in order of smallest deadline */
+void prioritiseEDF(struct Task *tasks, int n);
+
+
+/* Generates a schedule using EDF */
+struct ScheduleEvent* scheduleEDF(int *numEvents, struct Task *tasks, int n);
+
 #endif //SCHEDULER_SCHEDULER_H

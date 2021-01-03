@@ -67,6 +67,11 @@ int schedulabilityCheck(struct Task *tasks, int n) {
 
 void prioritiseRMS(struct Task *tasks, int n) {
 
+    // Set all priorities to unassigned
+    for (int i = 0; i < n; ++i) {
+        tasks[i].priority = -1;
+    }
+
     // Longest possible period of a given task is the super period
     int maxPeriod = superPeriod(tasks, n);
 
@@ -185,4 +190,38 @@ struct ScheduleEvent* scheduleRMS(int *numEvents, struct Task *tasks, int n) {
 
     }
     return schedule;
+}
+
+
+void prioritiseEDF(struct Task *tasks, int n) {
+
+    // Set all priorities to unassigned
+    for (int i = 0; i < n; ++i) {
+        tasks[i].priority = -1;
+    }
+
+    // Longest possible deadline of a given task is the super period
+    int maxPeriod = superPeriod(tasks, n);
+
+    for (int i = 0; i < n; ++i) {
+        int smallest = maxPeriod;
+        int smallestPos = 0;
+
+        for (int j = 0; j < n; ++j) {
+
+            // If priority has not been set and period is smaller than currently smallest period found
+            if (tasks[j].priority == -1 && (tasks[j].period * (tasks[j].completions + 1)) <= smallest) {
+                smallest = tasks[j].period * (tasks[j].completions + 1);
+                smallestPos = j;
+            }
+        }
+
+        // Set priority of smallest period unassigned task to iteration of loop
+        tasks[smallestPos].priority = i;
+    }
+
+}
+
+struct ScheduleEvent* scheduleEDF(int *numEvents, struct Task *tasks, int n) {
+
 }

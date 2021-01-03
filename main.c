@@ -69,17 +69,9 @@ int readFile(char *filename) {
     return 0;
 }
 
-// Get next deadline of task at a certain time
-int nextDeadline(int time, int n) {
-
-    int completions;
-    completions = (int) floor((double) time / (double) tasks[n].period);
-    return tasks[n].period * (completions + 1);
-}
-
 int main() {
 
-    readFile("C:\\Users\\Oliver\\Programming\\CLion\\Scheduler\\testcases\\testcase1.txt");
+    readFile("C:\\Users\\Oliver\\Programming\\CLion\\Scheduler\\testcases\\testcase2.txt");
 
     switch (schedulabilityCheck(tasks, numTasks)) {
         case 0:
@@ -96,14 +88,17 @@ int main() {
             break;
     }
 
-    prioritiseRMS(tasks, numTasks);
+    //prioritiseRMS(tasks, numTasks);
+    prioritiseEDF(tasks, numTasks);
 
     printTasks(tasks, numTasks);
 
+    /*
     schedule = scheduleRMS(&numEvents, tasks, numTasks);
     printSchedule(schedule, numEvents);
+    */
 
-    printf("Super Period: %d\n", superPeriod(tasks, numTasks));
+    //printf("Super Period: %d\n", superPeriod(tasks, numTasks));
 
     return 0;
 }
