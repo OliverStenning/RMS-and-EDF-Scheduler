@@ -2,13 +2,13 @@
 #include <stdio.h>
 #include <math.h>
 
-void printSchedule(struct ScheduleEvent *schedule, int n) {
+void printSchedule(struct ScheduleEvent *schedule, int n, int m) {
 
     printf("\nSCHEDULE\n");
 
     for (int i = 0; i < n - 1; ++i) {
 
-        // Only print if the schedules
+        // Only print if the schedules are defined
         if (schedule[i].type != 0) {
             // Start line with time
             printf("%d ", schedule[i].time);
@@ -39,6 +39,25 @@ void printSchedule(struct ScheduleEvent *schedule, int n) {
             }
         }
     }
+
+    printf("%d Deadline Misses\n", m);
+}
+
+void printSchedulabilityCheck(struct Task *tasks, int n) {
+    switch (schedulabilityCheck(tasks, n)) {
+        case 0:
+            printf("Can be scheduled with RMS and EDF\n");
+            break;
+        case 1:
+            printf("Can be scheduled with RMS only\n");
+            break;
+        case 2:
+            printf("Can be scheduled with EDF only\n");
+            break;
+        default:
+            printf("Cannot be scheduled\n");
+            break;
+    }
 }
 
 int schedulabilityCheck(struct Task *tasks, int n) {
@@ -62,7 +81,6 @@ int schedulabilityCheck(struct Task *tasks, int n) {
     } else {
         return 3;
     }
-
 }
 
 void prioritiseRMS(struct Task *tasks, int n) {
@@ -91,25 +109,64 @@ void prioritiseRMS(struct Task *tasks, int n) {
         // Set priority of smallest period unassigned task to iteration of loop
         tasks[smallestPos].priority = i;
     }
-
 }
 
-struct ScheduleEvent* scheduleRMS(int *numEvents, struct Task *tasks, int n) {
+void prioritiseEDF(struct Task *tasks, int n) {
 
-    // Calculate number of events without misses
-    int sPeriod = superPeriod(tasks, n);
-    *numEvents = sPeriod;
+    // Set all priorities to unassigned
     for (int i = 0; i < n; ++i) {
-        // Add number of complete periods in super period per task as maximum completions
-        *numEvents += sPeriod / tasks[i].period;
+        tasks[i].priority = -1;
     }
 
-    // Allocate minimum amount of memory used
+    // Longest possible deadline of a given task is the super period
+    int maxPeriod = superPeriod(tasks, n);
+
+    for (int i = 0; i < n; ++i) {
+        int smallest = maxPeriod;
+        int smallestPos = 0;
+
+        for (int j = 0; j < n; ++j) {
+
+            // If priority has not been set and period is smaller than currently smallest period found
+            if (tasks[j].priority == -1 && (tasks[j].period * (tasks[j].completions + 1)) <= smallest) {
+                smallest = tasks[j].period * (tasks[j].completions + 1);
+                smallestPos = j;
+            }
+        }
+
+        // Set priority of smallest period unassigned task to iteration of loop
+        tasks[smallestPos].priority = i;
+    }
+}
+
+struct ScheduleEvent* schedule(int *numEvents, int *numMisses, struct Task *tasks, int n, int isEDF) {
+
+    // Prioritise tasks using RMS if EDF not selected
+    if (!isEDF) {
+        prioritiseRMS(tasks, n);
+    }
+
+    // Reset number of misses if previously scheduled
+    (*numMisses) = 0;
+
+    // Get super period of tasks
+    int sPeriod = superPeriod(tasks, n);
+
+    // Allocate minimum amount of memory used for execute/idle events
+    // Complete and miss event quantity is unknown before scheduling
+    *numEvents = sPeriod;
     struct ScheduleEvent *schedule = malloc(sizeof(struct ScheduleEvent) * (*numEvents));
 
+    // Position of last event in schedule array
     int eventPos = 0;
 
+    // Loop through all time values in super period
     for (int time = 0; time < sPeriod; ++time) {
+
+        // Reprioritise tasks every iteration depending on nearest deadlines if EDF
+        if (isEDF) {
+            prioritiseEDF(tasks, n);
+        }
 
         // Reset task progress when period is reached and task is completed
         for (int j = 0; j < n; ++j) {
@@ -144,12 +201,17 @@ struct ScheduleEvent* scheduleRMS(int *numEvents, struct Task *tasks, int n) {
         // Check to see if any tasks have missed their deadlines
         for (int j = 0; j < n; ++j) {
             if (tasks[j].completions < floor(((double) time) / ((double) tasks[j].period))) {
+
+                // Allocate more space for miss event
                 (*numEvents)++;
                 schedule = realloc(schedule, sizeof(struct ScheduleEvent) * (*numEvents));
+
+                // Add miss event to schedule
                 schedule[eventPos].time = time;
                 schedule[eventPos].name = tasks[j].name;
                 schedule[eventPos].type = 3; // Misses type
                 schedule[eventPos].completions = tasks[j].completions;
+                (*numMisses)++;
                 eventPos++;
             }
         }
@@ -179,8 +241,14 @@ struct ScheduleEvent* scheduleRMS(int *numEvents, struct Task *tasks, int n) {
                 tasks[nextTask].progress = 0;
             }
 
+            // Allocate more space for completion event
+            (*numEvents)++;
+            schedule = realloc(schedule, sizeof(struct ScheduleEvent) * (*numEvents));
+
+            // Increment completions counter
             tasks[nextTask].completions++;
 
+            // Add completion event to schedule
             schedule[eventPos].time = time;
             schedule[eventPos].name = tasks[nextTask].name;
             schedule[eventPos].type = 2; // Completes type
@@ -190,38 +258,4 @@ struct ScheduleEvent* scheduleRMS(int *numEvents, struct Task *tasks, int n) {
 
     }
     return schedule;
-}
-
-
-void prioritiseEDF(struct Task *tasks, int n) {
-
-    // Set all priorities to unassigned
-    for (int i = 0; i < n; ++i) {
-        tasks[i].priority = -1;
-    }
-
-    // Longest possible deadline of a given task is the super period
-    int maxPeriod = superPeriod(tasks, n);
-
-    for (int i = 0; i < n; ++i) {
-        int smallest = maxPeriod;
-        int smallestPos = 0;
-
-        for (int j = 0; j < n; ++j) {
-
-            // If priority has not been set and period is smaller than currently smallest period found
-            if (tasks[j].priority == -1 && (tasks[j].period * (tasks[j].completions + 1)) <= smallest) {
-                smallest = tasks[j].period * (tasks[j].completions + 1);
-                smallestPos = j;
-            }
-        }
-
-        // Set priority of smallest period unassigned task to iteration of loop
-        tasks[smallestPos].priority = i;
-    }
-
-}
-
-struct ScheduleEvent* scheduleEDF(int *numEvents, struct Task *tasks, int n) {
-
 }

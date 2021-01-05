@@ -21,3 +21,10 @@ int superPeriod(struct Task *tasks, int n) {
 
     return lcm(periods, n);
 }
+
+void resetTasks(struct Task *tasks, int n) {
+    for (int i = 0; i < n; ++i) {
+        tasks[i].completions = 0;
+        tasks[i].progress = 0;
+    }
+}

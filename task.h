@@ -17,4 +17,7 @@ void printTasks(struct Task *tasks, int n);
 /* Calculates the super period of current tasks */
 int superPeriod(struct Task *tasks, int n);
 
+/* Resets task values altered while scheduling */
+void resetTasks(struct Task *tasks, int n);
+
 #endif //SCHEDULER_TASK_H
