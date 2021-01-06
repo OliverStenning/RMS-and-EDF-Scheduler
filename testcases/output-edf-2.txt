@@ -1,0 +1,34 @@
+3 Tasks
+0 Task 2 Executes
+0 Task 2 Completes
+1 Task 3 Executes
+2 Task 3 Executes
+2 Task 3 Completes
+3 Task 1 Executes
+4 Task 2 Executes
+4 Task 2 Completes
+5 Task 3 Executes
+6 Task 3 Executes
+6 Task 3 Completes
+7 Task 1 Executes
+8 Task 1 Executes
+9 Task 1 Executes
+10 Task 1 Misses
+10 Task 1 Executes
+10 Task 1 Completes
+11 Task 2 Executes
+11 Task 2 Completes
+12 Task 3 Executes
+13 Task 3 Executes
+13 Task 3 Completes
+14 Task 2 Executes
+14 Task 2 Completes
+15 Task 3 Executes
+16 Task 3 Executes
+16 Task 3 Completes
+17 Task 2 Executes
+17 Task 2 Completes
+18 Task 1 Executes
+19 Task 1 Executes
+1 Deadline Misses
+Scheduling Finishes

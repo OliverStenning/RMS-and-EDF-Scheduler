@@ -79,6 +79,8 @@ int saveFile(char *filename) {
         return 1;
     }
 
+    fprintf(f, "%d Tasks\n", numTasks);
+
     for (int i = 0; i < numEvents; ++i) {
 
         // Dont output event if undefined type or idle
@@ -106,7 +108,8 @@ int saveFile(char *filename) {
         }
     }
 
-    fprintf(f, "%d Deadline Misses", numMisses);
+    fprintf(f, "%d Deadline Misses\n", numMisses);
+    fprintf(f, "Scheduling Finishes");
 
     // Close file
     fclose(f);
@@ -122,7 +125,7 @@ int main() {
         printf("Enter input file location:\n");
         scanf("%s", filename);
         if (strcmp(filename, "default") == 0) {
-            strcpy(filename, "C:\\Users\\Oliver\\Programming\\CLion\\Scheduler\\testcases\\testcase1.txt");
+            strcpy(filename, "C:\\Users\\Oliver\\Programming\\Scheduler\\testcases\\testcase4.txt");
         }
         reading = readFile(filename);
     }
@@ -136,7 +139,7 @@ int main() {
         printf("Enter RMS output file location:\n");
         scanf("%s", filename);
         if (strcmp(filename, "default") == 0) {
-            strcpy(filename, "C:\\Users\\Oliver\\Programming\\CLion\\Scheduler\\testcases\\output-rms.txt");
+            strcpy(filename, "C:\\Users\\Oliver\\Programming\\Scheduler\\testcases\\output-rms-4.txt");
         }
         reading = saveFile(filename);
     }
@@ -156,7 +159,7 @@ int main() {
         printf("Enter RMS output file location:\n");
         scanf("%s", filename);
         if (strcmp(filename, "default") == 0) {
-            strcpy(filename, "C:\\Users\\Oliver\\Programming\\CLion\\Scheduler\\testcases\\output-edf.txt");
+            strcpy(filename, "C:\\Users\\Oliver\\Programming\\Scheduler\\testcases\\output-edf-4.txt");
         }
         reading = saveFile(filename);
     }
