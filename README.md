@@ -1,6 +1,6 @@
 # RMS-and-EDF-Scheduler
-Implementation of RMS and EDF Scheduling
+Implementation of an RMS and EDF Scheduler using C and a Python script for generating schedule plots.
 
-A C program which takes input .txt files with task information and generates output .txt files with RMS and EDF scheduling.
+The C program takes an input .txt file with task information and generates output .txt files with an RMS and EDF schedule.
 
-A Python script to plot those output files on a gantt chart with green circles to indicate task completitions and red crosses to indicate deadline misses.
+The Python script plots those output files on a gantt chart with green circles to indicate task completitions and red crosses to indicate deadline misses.
