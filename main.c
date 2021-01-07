@@ -84,20 +84,20 @@ int saveFile(char *filename) {
     for (int i = 0; i < numEvents; ++i) {
 
         // Dont output event if undefined type or idle
-        if (scheduleList[i].type != 0 && scheduleList[i].type != 4) {
+        if (scheduleList[i].type != Undefined && scheduleList[i].type != Idle) {
 
             // Start line with time and task name
             fprintf(f, "%d Task %d ", scheduleList[i].time, scheduleList[i].name);
 
             // Add correct event type to end
             switch (scheduleList[i].type) {
-                case 1:
+                case Executes:
                     fprintf(f, "Executes\n");
                     break;
-                case 2:
+                case Completes:
                     fprintf(f, "Completes\n");
                     break;
-                case 3:
+                case Misses:
                     fprintf(f, "Misses\n");
                     break;
                 default:
@@ -125,7 +125,7 @@ int main() {
         printf("Enter input file location:\n");
         scanf("%s", filename);
         if (strcmp(filename, "default") == 0) {
-            strcpy(filename, "C:\\Users\\Oliver\\Programming\\Scheduler\\testcases\\testcase4.txt");
+            strcpy(filename, "C:\\Users\\Oliver\\Programming\\Scheduler\\testcases\\testcase2.txt");
         }
         reading = readFile(filename);
     }
@@ -139,7 +139,7 @@ int main() {
         printf("Enter RMS output file location:\n");
         scanf("%s", filename);
         if (strcmp(filename, "default") == 0) {
-            strcpy(filename, "C:\\Users\\Oliver\\Programming\\Scheduler\\testcases\\output-rms-4.txt");
+            strcpy(filename, "C:\\Users\\Oliver\\Programming\\Scheduler\\testcases\\output-rms-2.txt");
         }
         reading = saveFile(filename);
     }
@@ -159,12 +159,10 @@ int main() {
         printf("Enter RMS output file location:\n");
         scanf("%s", filename);
         if (strcmp(filename, "default") == 0) {
-            strcpy(filename, "C:\\Users\\Oliver\\Programming\\Scheduler\\testcases\\output-edf-4.txt");
+            strcpy(filename, "C:\\Users\\Oliver\\Programming\\Scheduler\\testcases\\output-edf-2.txt");
         }
         reading = saveFile(filename);
     }
-
-
 
     // Free memory used for storing schedule and tasks
     free(scheduleList);

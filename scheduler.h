@@ -4,11 +4,13 @@
 #include "task.h"
 #include <stdlib.h>
 
+enum eventType{Undefined, Executes, Completes, Misses, Idle};
+
 /* Holds all data of each event in schedule */
 struct ScheduleEvent {
     int time;
     int name;
-    int type; // 0 = Undefined | 1 = Executes | 2 = Completes | 3 = Misses | 4 = Idle
+    enum eventType type; // 0 = Undefined | 1 = Executes | 2 = Completes | 3 = Misses | 4 = Idle
     int completions;
 };
 

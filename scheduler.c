@@ -9,12 +9,12 @@ void printSchedule(struct ScheduleEvent *schedule, int n, int m) {
     for (int i = 0; i < n - 1; ++i) {
 
         // Only print if the schedules are defined
-        if (schedule[i].type != 0) {
+        if (schedule[i].type != Undefined) {
             // Start line with time
             printf("%d ", schedule[i].time);
 
             // Finish line if idle
-            if (schedule[i].type == 4) {
+            if (schedule[i].type == Idle) {
                 printf("Idle\n");
             } else {
 
@@ -23,13 +23,13 @@ void printSchedule(struct ScheduleEvent *schedule, int n, int m) {
 
                 // Add operation and finish line
                 switch (schedule[i].type) {
-                    case 1:
+                    case Executes:
                         printf("Executes\n");
                         break;
-                    case 2:
+                    case Completes:
                         printf("Completes\n");
                         break;
-                    case 3:
+                    case Misses:
                         printf("Misses\n");
                         break;
                     default:
@@ -189,8 +189,8 @@ struct ScheduleEvent* schedule(int *numEvents, int *numMisses, struct Task *task
         // If no uncompleted tasks are found then idle at this time
         if (nextTask == -1) {
             schedule[eventPos].name = 0; // Default value
-            schedule[eventPos].type = 4; // Idle type
-            schedule[eventPos].time = time; // Default value
+            schedule[eventPos].type = Idle;
+            schedule[eventPos].time = time; // Current time
             schedule[eventPos].completions = 0; // Default value
             eventPos++;
 
@@ -209,7 +209,7 @@ struct ScheduleEvent* schedule(int *numEvents, int *numMisses, struct Task *task
                 // Add miss event to schedule
                 schedule[eventPos].time = time;
                 schedule[eventPos].name = tasks[j].name;
-                schedule[eventPos].type = 3; // Misses type
+                schedule[eventPos].type = Misses;
                 schedule[eventPos].completions = tasks[j].completions;
                 (*numMisses)++;
                 eventPos++;
@@ -226,7 +226,7 @@ struct ScheduleEvent* schedule(int *numEvents, int *numMisses, struct Task *task
         // Add new execution event to schedule
         schedule[eventPos].time = time;
         schedule[eventPos].name = tasks[nextTask].name;
-        schedule[eventPos].type = 1; // Executes type
+        schedule[eventPos].type = Executes;
         schedule[eventPos].completions = tasks[nextTask].completions;
         eventPos++;
 
@@ -251,7 +251,7 @@ struct ScheduleEvent* schedule(int *numEvents, int *numMisses, struct Task *task
             // Add completion event to schedule
             schedule[eventPos].time = time;
             schedule[eventPos].name = tasks[nextTask].name;
-            schedule[eventPos].type = 2; // Completes type
+            schedule[eventPos].type = Completes;
             schedule[eventPos].completions = tasks[nextTask].completions;
             eventPos++;
         }
